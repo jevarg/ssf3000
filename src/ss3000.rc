@@ -1,0 +1,16 @@
+#include <windows.h>
+#include "main.h"
+
+DLG_SCRNSAVECONFIGURE DIALOG 6, 18, 160, 63
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "SS3000 config"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    GROUPBOX      "Redraw Speed", 101, 0, 6, 98, 40
+    SCROLLBAR     ID_SPEED, 5, 31, 89, 10
+    LTEXT         "Fast", 103, 6, 21, 20, 8
+    LTEXT         "Slow", 104, 75, 21, 20, 8
+    PUSHBUTTON    "OK", ID_OK, 117, 10, 40, 14
+    PUSHBUTTON    "Cancel", ID_CANCEL, 117, 32, 40, 14
+END
