@@ -12,9 +12,14 @@ add_executable(${PROJECT_NAME} WIN32
         src/bitmap.h
         src/bitmap.h
         src/F3000.cpp
-        src/F3000.h)
+        src/F3000.h
+        src/dx.cpp
+        src/dx.h)
 
 target_link_libraries(${PROJECT_NAME}
         Scrnsave.lib
         Gdiplus.lib
-        Comctl32.dll)
+        Comctl32.dll
+        d3d11.lib
+        dxgi.lib
+        d3dcompiler.lib)

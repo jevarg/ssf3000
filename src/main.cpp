@@ -5,6 +5,7 @@
 
 #include "main.h"
 #include "F3000.h"
+#include "dx.h"
 
 LONG lSpeed = DEFVEL;                   // redraw speed variable
 int i = 0;
@@ -50,6 +51,8 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, L
 
             // Retrieve a handle to the OK push button control.
             hOK = GetDlgItem(hDlg, ID_OK);
+//            dxInit(hDlg);
+
 
             return TRUE;
         case WM_HSCROLL:
@@ -115,7 +118,6 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
     static HDC hdc;      // device-context handle
     static RECT rc;       // RECT structure
     static UINT uTimer;   // timer identifier
-    PAINTSTRUCT lpPaint;
 
     switch (message) {
         case WM_CREATE:
@@ -134,8 +136,10 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 
             // Set a timer for the screen saver window using the
             // redraw rate stored in Regedit.ini.
-            uTimer = SetTimer(hwnd, 1, 16, nullptr);
+//            uTimer = SetTimer(hwnd, 1, 16, nullptr);
+//            SetWindowPos(hwnd, nullptr, 0, 0, 320, 200, 0);
             f3000 = new F3000();
+//            dxInit(hwnd);
             break;
 
         case WM_ERASEBKGND:
@@ -143,13 +147,11 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
             // WM_TIMER message, allowing the screen saver to
             // lpPaint the background as appropriate.
 
-//            hdc = GetDC(hwnd);
-//            hdc = BeginPaint(hwnd, &lpPaint);
-//            f3000->render(hdc);
-//            EndPaint(hwnd, &lpPaint);
-//            GetClientRect(hwnd, &rc);
-//            FillRect(hdc, &rc, (HBRUSH) GetStockObject(BLACK_BRUSH));
-//            ReleaseDC(hwnd, hdc);
+            hdc = GetDC(hwnd);
+            GetClientRect(hwnd, &rc);
+            FillRect(hdc, &rc, (HBRUSH) GetStockObject(BLACK_BRUSH));
+            ReleaseDC(hwnd, hdc);
+            return 1;
             break;
 
         case WM_TIMER:
@@ -159,9 +161,10 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
             // light gray, dark gray, or black brush each
             // time a WM_TIMER message is issued.
 
-            hdc = GetDC(hwnd);
-            f3000->render(hdc);
-            ReleaseDC(hwnd, hdc);
+//            hdc = GetDC(hwnd);
+//            f3000->update();
+//            f3000->render(hdc);
+//            ReleaseDC(hwnd, hdc);
             break;
 
         case WM_DESTROY:
@@ -173,6 +176,13 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 
             delete f3000;
             break;
+
+        case WM_PAINT:
+            hdc = GetDC(hwnd);
+            f3000->update();
+            f3000->render(hdc);
+            ReleaseDC(hwnd, hdc);
+            return 0;
 
         default:
             break;

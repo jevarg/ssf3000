@@ -18,7 +18,12 @@ F3000::~F3000() {
     delete bmp;
 }
 
+void F3000::update() {
+    x += 3;
+    y += 3;
+}
+
 void F3000::render(HDC hdc) {
     Graphics graphics(hdc);
-    graphics.DrawImage(bmp, 0, 0);
+    graphics.DrawImage(bmp, (INT) x, (INT) y);
 }
