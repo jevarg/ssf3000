@@ -13,8 +13,14 @@ add_executable(${PROJECT_NAME} WIN32
         src/bitmap.h
         src/F3000.cpp
         src/F3000.h
-        src/dx.cpp
-        src/dx.h)
+        src/gfx/dx/DXRenderer.cpp
+        src/gfx/dx/DXRenderer.h
+        src/gfx/dx/Shader.cpp
+        src/gfx/dx/Shader.h
+        src/gfx/dx/RenderTarget.cpp
+        src/gfx/dx/RenderTarget.h
+        src/gfx/dx/Triangle.cpp
+        src/gfx/dx/Triangle.h)
 
 target_link_libraries(${PROJECT_NAME}
         Scrnsave.lib
