@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include "DXRenderer.h"
+#include "objects/Cube.h"
 
 DXRenderer::DXRenderer(HWND hwnd) {
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {0};
@@ -41,7 +42,7 @@ DXRenderer::DXRenderer(HWND hwnd) {
 
     renderTarget = std::make_shared<RenderTarget>(swapChain, device);
     shader = std::make_shared<Shader>(device, L"shaders/default.hlsl", L"shaders/default.hlsl");
-    triangle = std::make_unique<Triangle>(device);
+    object = std::make_unique<Cube>(device);
 }
 
 void DXRenderer::clear() {
@@ -52,10 +53,9 @@ void DXRenderer::clear() {
 
 void DXRenderer::render(HWND hwnd) {
     ID3D11RenderTargetView *rt = renderTarget->get();
-
-    UINT vertex_stride = 3 * sizeof(float);
-    UINT vertex_offset = 0;
-    UINT vertex_count = 3;
+    ID3D11Buffer *vertexBuffer = object->getBuffer();
+    UINT vertexStride = object->getVertexStride();
+    UINT vertexOffset = object->getVertexOffset();
 
     RECT winRect;
     GetClientRect(hwnd, &winRect);
@@ -64,7 +64,7 @@ void DXRenderer::render(HWND hwnd) {
             0.0f,
             (FLOAT) (winRect.right - winRect.left),
             (FLOAT) (winRect.bottom - winRect.top),
-            0.0f,
+            -1.0f,
             1.0f};
     deviceCtx->RSSetViewports(1, &viewport);
     deviceCtx->OMSetRenderTargets(1, &rt, nullptr);
@@ -74,13 +74,13 @@ void DXRenderer::render(HWND hwnd) {
     deviceCtx->IASetVertexBuffers(
             0,
             1,
-            &triangle->vertexBuffer,
-            &vertex_stride,
-            &vertex_offset);
+            &vertexBuffer,
+            &vertexStride,
+            &vertexOffset);
 
     deviceCtx->VSSetShader(shader->getVertexShader(), nullptr, 0);
     deviceCtx->PSSetShader(shader->getPixelShader(), nullptr, 0);
 
-    deviceCtx->Draw(vertex_count, 0);
+    deviceCtx->Draw(object->getVertexCount(), 0);
     swapChain->Present(1, 0);
 }

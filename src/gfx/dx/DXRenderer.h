@@ -8,7 +8,7 @@
 #include <memory>
 #include "Shader.h"
 #include "RenderTarget.h"
-#include "Triangle.h"
+#include "objects/AObject.h"
 
 class DXRenderer {
 public:
@@ -26,5 +26,5 @@ private:
     std::shared_ptr<RenderTarget> renderTarget = nullptr;
     std::shared_ptr<Shader> shader = nullptr;
 
-    std::unique_ptr<Triangle> triangle = nullptr;
+    std::unique_ptr<AObject> object = nullptr;
 };

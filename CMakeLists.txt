@@ -19,8 +19,11 @@ add_executable(${PROJECT_NAME} WIN32
         src/gfx/dx/Shader.h
         src/gfx/dx/RenderTarget.cpp
         src/gfx/dx/RenderTarget.h
-        src/gfx/dx/Triangle.cpp
-        src/gfx/dx/Triangle.h)
+        src/gfx/dx/objects/Triangle.cpp
+        src/gfx/dx/objects/Triangle.h
+        src/gfx/dx/objects/Cube.cpp
+        src/gfx/dx/objects/Cube.h
+        src/gfx/dx/objects/AObject.h)
 
 target_link_libraries(${PROJECT_NAME}
         Scrnsave.lib

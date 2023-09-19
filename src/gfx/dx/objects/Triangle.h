@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include <d3d11.h>
+#include "AObject.h"
 
-class Triangle {
+class Triangle: public AObject {
 public:
     explicit Triangle(ID3D11Device *device);
-
-    ID3D11Buffer *vertexBuffer = nullptr;
+    Triangle(const Triangle&) = delete;
 };
