@@ -5,6 +5,7 @@
 #include <cassert>
 #include "DXRenderer.h"
 #include "objects/Cube.h"
+#include "objects/Triangle.h"
 
 DXRenderer::DXRenderer(HWND hwnd) {
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {0};
@@ -42,7 +43,7 @@ DXRenderer::DXRenderer(HWND hwnd) {
 
     renderTarget = std::make_shared<RenderTarget>(swapChain, device);
     shader = std::make_shared<Shader>(device, L"shaders/default.hlsl", L"shaders/default.hlsl");
-    object = std::make_unique<Cube>(device);
+    object = std::make_unique<Triangle>(device);
 }
 
 void DXRenderer::clear() {
@@ -64,7 +65,7 @@ void DXRenderer::render(HWND hwnd) {
             0.0f,
             (FLOAT) (winRect.right - winRect.left),
             (FLOAT) (winRect.bottom - winRect.top),
-            -1.0f,
+            0.0f,
             1.0f};
     deviceCtx->RSSetViewports(1, &viewport);
     deviceCtx->OMSetRenderTargets(1, &rt, nullptr);

@@ -7,12 +7,12 @@
 
 Cube::Cube(ID3D11Device *device): AObject(6, 3 * sizeof(float), 0) {
     float vertexData[] = {
-            -0.5f, 0.5f, -0.5f,
-            -0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, -0.5f,
-            0.5f, 0.5f, -0.5f,
-            -0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f,
+            -0.5f, 0.5f, 0.0f,
+            0.5f, 0.5f, 0.0f,
+            -0.5f, 0.5f, 1.0f,
+            -0.5f, 0.5f, 1.0f,
+            0.5f, 0.5f, 0.0f,
+            0.5f, 0.5f, 1.0f,
     };
 
     { /*** load mesh data into vertex buffer **/

@@ -5,12 +5,12 @@
 #include <cassert>
 #include "Triangle.h"
 
-Triangle::Triangle(ID3D11Device *device) : AObject(3, 3 * sizeof(float), 0) {
+Triangle::Triangle(ID3D11Device *device) : AObject(3, 6 * sizeof(float), 0) {
 
     float vertexData[] = {
-            0.0f, 0.5f, 0.0f, // point at top
-            0.5f, -0.5f, 0.0f, // point at bottom-right
-            -0.5f, -0.5f, 0.0f, // point at bottom-left
+            0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // point at top
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // point at bottom-right
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // point at bottom-left
     };
 
     { /*** load mesh data into vertex buffer **/
