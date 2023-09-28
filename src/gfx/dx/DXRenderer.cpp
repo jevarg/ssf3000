@@ -3,11 +3,14 @@
 //
 
 #include <cassert>
+#include <chrono>
 #include "DXRenderer.h"
 #include "objects/Cube.h"
 #include "objects/Triangle.h"
 
 DXRenderer::DXRenderer(HWND hwnd) {
+    assert(sizeof(ConstantBuffer) == 16);
+
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {0};
     swapChainDesc.BufferDesc.RefreshRate.Numerator = 1;
     swapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
@@ -52,7 +55,38 @@ void DXRenderer::clear() {
     deviceCtx->ClearRenderTargetView(renderTarget->get(), background_colour);
 }
 
+ID3D11Buffer *DXRenderer::createShaderConstants() {
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    auto time = duration.count();
+
+    ConstantBuffer constData;
+    constData.time = time;
+
+    // Fill in a buffer description.
+    D3D11_BUFFER_DESC cbDesc;
+    cbDesc.ByteWidth = sizeof(ConstantBuffer);
+    cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+    cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    cbDesc.MiscFlags = 0;
+    cbDesc.StructureByteStride = 0;
+
+    // Fill in the subresource constData.
+    D3D11_SUBRESOURCE_DATA InitData;
+    InitData.pSysMem = &constData;
+    InitData.SysMemPitch = 0;
+    InitData.SysMemSlicePitch = 0;
+
+    // Create the buffer.
+    ID3D11Buffer *buffer;
+    HRESULT hr = device->CreateBuffer(&cbDesc, &InitData, &buffer);
+    assert(SUCCEEDED(hr));
+
+    return buffer;
+}
+
 void DXRenderer::render(HWND hwnd) {
+    clear();
     ID3D11RenderTargetView *rt = renderTarget->get();
     ID3D11Buffer *vertexBuffer = object->getBuffer();
     UINT vertexStride = object->getVertexStride();
@@ -79,6 +113,8 @@ void DXRenderer::render(HWND hwnd) {
             &vertexStride,
             &vertexOffset);
 
+    ID3D11Buffer *buffer = createShaderConstants();
+    deviceCtx->VSSetConstantBuffers(0, 1, &buffer);
     deviceCtx->VSSetShader(shader->getVertexShader(), nullptr, 0);
     deviceCtx->PSSetShader(shader->getPixelShader(), nullptr, 0);
 

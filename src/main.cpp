@@ -123,6 +123,7 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 
     switch (message) {
         case WM_CREATE:
+            setvbuf(stdout, NULL, _IONBF, 0);
             // Retrieve the application name from the .rc file.
             LoadString(hMainInstance, idsAppName, szAppName, 80 * sizeof(TCHAR));
 
