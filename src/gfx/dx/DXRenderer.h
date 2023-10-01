@@ -11,11 +11,6 @@
 #include "RenderTarget.h"
 #include "objects/AObject.h"
 
-typedef struct ConstantBuffer {
-    int32_t time;
-    int32_t _padding[3];
-} ConstantBuffer;
-
 class DXRenderer {
 public:
     explicit DXRenderer(HWND hwnd);
@@ -34,5 +29,5 @@ private:
 
     std::unique_ptr<AObject> object = nullptr;
 
-    ID3D11Buffer * createShaderConstants();
+//    ID3D11Buffer * createShaderConstants();
 };

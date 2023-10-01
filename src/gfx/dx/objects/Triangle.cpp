@@ -13,7 +13,7 @@ Triangle::Triangle(ID3D11Device *device) : AObject(3, 6 * sizeof(float), 0) {
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // point at bottom-left
     };
 
-    { /*** load mesh data into vertex buffer **/
+    { /*** load mesh data into vertex mBuffer **/
         D3D11_BUFFER_DESC bufferDesc = {};
         bufferDesc.ByteWidth = sizeof(vertexData);
         bufferDesc.Usage = D3D11_USAGE_DEFAULT;

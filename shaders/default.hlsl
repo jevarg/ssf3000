@@ -12,7 +12,7 @@ struct vs_out {
     float3 color : COLOR;
 };
 
-cbuffer ConstantBuffer {
+cbuffer DXConstantBuffer {
     int time;
 }
 
@@ -21,13 +21,22 @@ vs_out vs_main(vs_in input) {
   output.color = input.color;
 
   float angle = (time / 100000.0f % 360.0f) * (M_PI / 180.0f);
+//   float angle = 45 * (M_PI / 180.0f);
   float3x3 zRot = {
     {cos(angle), -sin(angle), 0},
     {sin(angle), cos(angle), 0},
     {0, 0, 1},
   };
 
+  float3x3 yRot = {
+    {cos(angle), 0, sin(angle)},
+    {0, 1, 0},
+    {-sin(angle), 0, cos(angle)},
+  };
+
+
   output.pos = float4(mul(zRot, input.pos), 1.0);
+//   output.pos = float4(input.pos, 1);
 
   return output;
 }

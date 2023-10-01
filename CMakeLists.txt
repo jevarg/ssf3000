@@ -23,7 +23,9 @@ add_executable(${PROJECT_NAME} WIN32
         src/gfx/dx/objects/Triangle.h
         src/gfx/dx/objects/Cube.cpp
         src/gfx/dx/objects/Cube.h
-        src/gfx/dx/objects/AObject.h)
+        src/gfx/dx/objects/AObject.h
+        src/gfx/dx/DXConstantBuffer.h
+        src/gfx/dx/ConstantBuffers.h)
 
 target_link_libraries(${PROJECT_NAME}
         Scrnsave.lib

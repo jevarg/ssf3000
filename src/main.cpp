@@ -3,21 +3,19 @@
 #include <windows.h>
 #include <ScrnSave.h>
 #include <strsafe.h>
+#include <DirectXMath.h>
 
 #include "main.h"
-#include "F3000.h"
 #include "gfx/dx/DXRenderer.h"
 
 LONG lSpeed = DEFVEL;                   // redraw speed variable
-int i = 0;
 
 CHAR szAppName[] = "Farming3000";
 CHAR szTemp[20];                        // temporary array of characters
 CHAR szRedrawSpeed[] = "Redraw Speed";  // .ini speed entry
 CHAR szIniFile[MAXFILELEN];             // .ini or registry file name
 
-F3000 *f3000;
-DXRenderer *renderer;
+std::unique_ptr<DXRenderer> renderer = nullptr;
 
 BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     static HWND hSpeed;   // handle to speed scroll bar
@@ -54,7 +52,6 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, L
             // Retrieve a handle to the OK push button control.
             hOK = GetDlgItem(hDlg, ID_OK);
 //            dxInit(hDlg);
-
 
             return TRUE;
         case WM_HSCROLL:
@@ -117,13 +114,25 @@ BOOL WINAPI ScreenSaverConfigureDialog(HWND hDlg, UINT message, WPARAM wParam, L
 }
 
 LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
-    static HDC hdc;      // device-context handle
-    static RECT rc;       // RECT structure
-    static UINT uTimer;   // timer identifier
-
     switch (message) {
-        case WM_CREATE:
-            setvbuf(stdout, NULL, _IONBF, 0);
+        case WM_MOUSEMOVE:
+        case WM_LBUTTONDOWN:
+        case WM_MBUTTONDOWN:
+        case WM_RBUTTONDOWN:
+            return TRUE;
+        case WM_ACTIVATE:
+            SetWindowLongPtr(hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN);
+            SetWindowPos(hwnd, nullptr, 0, 0, 1920, 1080, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+            return TRUE;
+
+        case WM_CREATE: {
+            if (!DirectX::XMVerifyCPUSupport()) {
+                MessageBox(hwnd, "Your CPU does not support DXMath!", "DXMath error!", MB_OK);
+                exit(1);
+            }
+
+            setvbuf(stdout, nullptr, _IONBF, 0);
+
             // Retrieve the application name from the .rc file.
             LoadString(hMainInstance, idsAppName, szAppName, 80 * sizeof(TCHAR));
 
@@ -137,35 +146,23 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
             lSpeed = GetPrivateProfileInt(szAppName, szRedrawSpeed,
                                           DEFVEL, szIniFile);
 
-//            f3000 = new F3000();
-            renderer = new DXRenderer(hwnd);
-//            dxInit(hwnd);
+            renderer = std::make_unique<DXRenderer>(hwnd);
             break;
-
+        }
         case WM_ERASEBKGND:
             renderer->clear();
-            return 1;
-
-        case WM_DESTROY:
-            // When the WM_DESTROY message is issued, the screen saver
-            // must destroy any of the timers that were set at WM_CREATE
-            // time.
-            if (uTimer)
-                KillTimer(hwnd, uTimer);
-
-//            delete f3000;
-            delete renderer;
-            break;
+            return TRUE;
 
         case WM_PAINT:
+//            renderer->clear();
             renderer->render(hwnd);
-            return 0;
+            return FALSE;
 
         default:
             break;
     }
 
-// DefScreenSaverProc processes any messages ignored by ScreenSaverProc.
+    // DefScreenSaverProc processes any messages ignored by ScreenSaverProc.
     return DefScreenSaverProc(hwnd, message, wParam, lParam);
 }
 

@@ -9,7 +9,7 @@
 #include "objects/Triangle.h"
 
 DXRenderer::DXRenderer(HWND hwnd) {
-    assert(sizeof(ConstantBuffer) == 16);
+    assert(sizeof(DXConstantBuffer) == 16);
 
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {0};
     swapChainDesc.BufferDesc.RefreshRate.Numerator = 1;
@@ -50,40 +50,40 @@ DXRenderer::DXRenderer(HWND hwnd) {
 }
 
 void DXRenderer::clear() {
-    /* clear the back buffer to cornflower blue for the new frame */
+    /* clear the back mBuffer to cornflower blue for the new frame */
     float background_colour[4] = {0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f};
     deviceCtx->ClearRenderTargetView(renderTarget->get(), background_colour);
 }
 
-ID3D11Buffer *DXRenderer::createShaderConstants() {
-    auto duration = std::chrono::system_clock::now().time_since_epoch();
-    auto time = duration.count();
-
-    ConstantBuffer constData;
-    constData.time = time;
-
-    // Fill in a buffer description.
-    D3D11_BUFFER_DESC cbDesc;
-    cbDesc.ByteWidth = sizeof(ConstantBuffer);
-    cbDesc.Usage = D3D11_USAGE_DYNAMIC;
-    cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    cbDesc.MiscFlags = 0;
-    cbDesc.StructureByteStride = 0;
-
-    // Fill in the subresource constData.
-    D3D11_SUBRESOURCE_DATA InitData;
-    InitData.pSysMem = &constData;
-    InitData.SysMemPitch = 0;
-    InitData.SysMemSlicePitch = 0;
-
-    // Create the buffer.
-    ID3D11Buffer *buffer;
-    HRESULT hr = device->CreateBuffer(&cbDesc, &InitData, &buffer);
-    assert(SUCCEEDED(hr));
-
-    return buffer;
-}
+//ID3D11Buffer *DXRenderer::createShaderConstants() {
+//    auto duration = std::chrono::system_clock::now().time_since_epoch();
+//    auto time = duration.count();
+//
+//    DXConstantBuffer constData;
+//    constData.time = (int32_t)(time % INT32_MAX);
+//
+//    // Fill in a mBuffer description.
+//    D3D11_BUFFER_DESC cbDesc;
+//    cbDesc.ByteWidth = sizeof(DXConstantBuffer);
+//    cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+//    cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+//    cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+//    cbDesc.MiscFlags = 0;
+//    cbDesc.StructureByteStride = 0;
+//
+//    // Fill in the subresource constData.
+//    D3D11_SUBRESOURCE_DATA InitData;
+//    InitData.pSysMem = &constData;
+//    InitData.SysMemPitch = 0;
+//    InitData.SysMemSlicePitch = 0;
+//
+//    // Create the mBuffer.
+//    ID3D11Buffer *buffer;
+//    HRESULT hr = device->CreateBuffer(&cbDesc, &InitData, &buffer);
+//    assert(SUCCEEDED(hr));
+//
+//    return buffer;
+//}
 
 void DXRenderer::render(HWND hwnd) {
     clear();
@@ -97,8 +97,8 @@ void DXRenderer::render(HWND hwnd) {
     D3D11_VIEWPORT viewport = {
             0.0f,
             0.0f,
-            (FLOAT) (winRect.right - winRect.left),
-            (FLOAT) (winRect.bottom - winRect.top),
+            static_cast<float>(winRect.right - winRect.left),
+            static_cast<float>(winRect.bottom - winRect.top),
             0.0f,
             1.0f};
     deviceCtx->RSSetViewports(1, &viewport);
