@@ -25,7 +25,7 @@ Triangle::Triangle(ID3D11Device *device) : AObject(3, 6 * sizeof(float), 0) {
         HRESULT hr = device->CreateBuffer(
                 &bufferDesc,
                 &data,
-                &vertexBuffer);
+                &m_VertexBuffer);
 
         assert(SUCCEEDED(hr));
     }

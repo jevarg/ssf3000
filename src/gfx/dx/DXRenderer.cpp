@@ -11,6 +11,8 @@
 #include "ConstantBuffers.h"
 #include "AppCB.h"
 
+using namespace DirectX;
+
 DXRenderer::DXRenderer(HWND hwnd) {
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {0};
     swapChainDesc.BufferDesc.RefreshRate.Numerator = 1;
@@ -47,7 +49,7 @@ DXRenderer::DXRenderer(HWND hwnd) {
 
     renderTarget = std::make_shared<RenderTarget>(swapChain, device);
     shader = std::make_shared<Shader>(device, L"shaders/default.hlsl", L"shaders/default.hlsl");
-    object = std::make_unique<Cube>(device);
+    object = std::make_unique<Triangle>(device);
 
     RECT winRect;
     GetClientRect(hwnd, &winRect);
@@ -61,10 +63,10 @@ DXRenderer::DXRenderer(HWND hwnd) {
     deviceCtx->RSSetViewports(1, &viewport);
 
     AppCB appCB(device);
-    appCB.setData(deviceCtx, DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45.0f),
+    appCB.setData(deviceCtx, XMMatrixPerspectiveFovLH(XMConvertToRadians(40.0f),
                                                                viewport.Width / viewport.Height,
                                                                0.1f,
-                                                               100.0f));
+                                                               1000.0f));
 
     constantBuffers.push_back(appCB); // CBType::App [0]
     constantBuffers.push_back(FrameCB(device)); // CBType::FRAME [1]
@@ -74,6 +76,10 @@ void DXRenderer::clear() {
     /* clear the back mBuffer to cornflower blue for the new frame */
     float background_colour[4] = {0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f};
     deviceCtx->ClearRenderTargetView(renderTarget->get(), background_colour);
+}
+
+void DXRenderer::update() {
+//    object->
 }
 
 void DXRenderer::render(HWND hwnd) {
@@ -94,15 +100,19 @@ void DXRenderer::render(HWND hwnd) {
             &vertexOffset);
 
     auto duration = std::chrono::system_clock::now().time_since_epoch();
-    DirectX::XMVECTOR eyePosition = DirectX::XMVectorSet(0, -2, -5, 1);
-    DirectX::XMVECTOR focusPoint = DirectX::XMVectorSet(0, 0, 0, 1);
-    DirectX::XMVECTOR upDirection = DirectX::XMVectorSet(0, 1, 0, 0);
+    XMVECTOR eyePosition = XMVectorSet(0, -2, -5, 0);
+    XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 0);
+    XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
 
-    auto viewMatrix = DirectX::XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+    auto viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 
+//    object->rotate(0, 5, 0);
+    object->translate(0.01f, 0, 0);
+//    object->scale(0.005f, 0, 0);
     constantBuffers[CBType::FRAME].setData<FrameCB::Data>(deviceCtx, {
             static_cast<int32_t>(duration.count()),
-            viewMatrix
+            viewMatrix,
+            object->getTransform()
     });
 
     ID3D11Buffer *cBuffers[] = {

@@ -68,7 +68,7 @@ Cube::Cube(ID3D11Device *device): AObject(36, 6 * sizeof(float), 0) {
         HRESULT hr = device->CreateBuffer(
                 &bufferDesc,
                 &data,
-                &vertexBuffer);
+                &m_VertexBuffer);
 
         assert(SUCCEEDED(hr));
     }

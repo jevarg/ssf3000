@@ -19,27 +19,12 @@ cbuffer AppCB : register(b0) {
 cbuffer FrameCB : register(b1) {
     int time;
     matrix viewMatrix;
+    matrix modelMatrix;
 }
 
 vs_out vs_main(vs_in input) {
   vs_out output = (vs_out)0; // zero the memory first
   output.color = input.color;
-
-  float angle = (time / 100000.0f % 359.0f) * (M_PI / 180.0f);
-//
-  matrix modelMatrix = {
-    {cos(angle), 0, sin(angle), 0},
-    {0, 1, 0, 0},
-    {-sin(angle), 0, cos(angle), 0},
-    {0, 0, 0, 1}
-  };
-
-//   matrix modelMatrix = {
-//     {1, 0, 0, 0},
-//     {0, 1, 0, 0},
-//     {0, 0, 1, 0},
-//     {0, 0, 0, 1},
-//   };
 
   matrix mvp = mul(projectionMatrix, mul(viewMatrix, modelMatrix));
   output.pos = mul(mvp, float4(input.pos, 1.0f));

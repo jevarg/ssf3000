@@ -13,6 +13,7 @@ public:
     struct Data {
         int32_t time;
         DirectX::XMMATRIX viewMatrix;
+        DirectX::XMMATRIX modelMatrix;
         [[maybe_unused]] int32_t _padding[3];
     };
 

@@ -155,6 +155,7 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 
         case WM_PAINT:
             renderer->clear();
+            renderer->update();
             renderer->render(hwnd);
             return TRUE;
 

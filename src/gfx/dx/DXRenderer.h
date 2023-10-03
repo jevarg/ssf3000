@@ -21,6 +21,7 @@ public:
 
     void clear();
     void render(HWND hwnd);
+    void update();
 
 private:
     IDXGISwapChain *swapChain = nullptr;
