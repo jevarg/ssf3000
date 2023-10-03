@@ -16,7 +16,7 @@ Shader::Shader(ID3D11Device *device, LPCWSTR vertexFile, LPCWSTR pixelFile) {
     ID3DBlob *ps_blob_ptr = nullptr;
     ID3DBlob *error_blob = nullptr;
 
-    // COMPILE VERTEX SHADER
+    // COMPILE FRAME SHADER
     HRESULT hr = D3DCompileFromFile(
             vertexFile,//L"shaders/default.hlsl",
             nullptr,

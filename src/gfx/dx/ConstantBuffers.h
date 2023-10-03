@@ -5,8 +5,9 @@
 #pragma once
 
 #include <cstdint>
+#include <DirectXMath.h>
 
-typedef struct CBVertex {
-    int32_t time;
-    int32_t _padding[3];
-} CBVertex;
+enum CBType {
+    APP = 0,
+    FRAME
+};

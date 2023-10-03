@@ -5,6 +5,7 @@
 #pragma once
 
 #include <d3d11.h>
+#include <DirectXMath.h>
 
 class AObject {
 public:
@@ -16,12 +17,17 @@ public:
 
     [[nodiscard]] virtual UINT getVertexOffset() const { return vertexOffset; }
 
-protected:
-    AObject(UINT vCount, UINT vStride, UINT vOffset) : vertexCount(vCount),
-                                                       vertexStride(vStride),
-                                                       vertexOffset(vOffset) {}
+    [[nodiscard]] virtual DirectX::XMMATRIX getModelMatrix() const { return modelMatrix; }
 
-    ID3D11Buffer *vertexBuffer = nullptr;
+protected:
+    AObject(UINT vCount, UINT vStride, UINT vOffset) : vertexBuffer(nullptr),
+                                                       vertexCount(vCount),
+                                                       vertexStride(vStride),
+                                                       vertexOffset(vOffset),
+                                                       modelMatrix(DirectX::XMMatrixIdentity()) {}
+
+    ID3D11Buffer *vertexBuffer;
+    DirectX::XMMATRIX modelMatrix;
 
     UINT vertexCount;
     UINT vertexStride;

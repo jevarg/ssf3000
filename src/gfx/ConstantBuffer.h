@@ -1,16 +1,18 @@
 //
-// Created by Jean on 10/1/2023.
+// Created by jeang on 10/2/2023.
 //
 
 #pragma once
 
-#include <cassert>
 #include <d3d11.h>
+#include <cstdio>
+#include <cassert>
 
-template<typename T>
-class DXConstantBuffer {
+class ConstantBuffer {
 public:
-    explicit DXConstantBuffer(ID3D11Device *device): mBuffer(nullptr) {
+    template<typename T>
+    explicit ConstantBuffer(ID3D11Device *device, [[maybe_unused]] T type): mBuffer(nullptr) {
+        assert((sizeof(T) % 16) == 0);
         // Fill in a buffer description.
         D3D11_BUFFER_DESC cbDesc = {0};
         cbDesc.ByteWidth = sizeof(T);
@@ -22,7 +24,15 @@ public:
                                           nullptr,
                                           &mBuffer);
         assert(SUCCEEDED(hr));
+    };
+
+    template<typename T>
+    void setData(ID3D11DeviceContext *deviceCtx, const T &data) {
+        deviceCtx->UpdateSubresource(mBuffer, 0, nullptr,
+                                     &data, 0, 0);
     }
+
+    ID3D11Buffer *getBuffer() { return mBuffer; }
 
 private:
     ID3D11Buffer *mBuffer;

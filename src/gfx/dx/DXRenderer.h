@@ -7,8 +7,11 @@
 #include <d3d11.h>
 #include <memory>
 #include <cstdint>
+#include <vector>
 #include "Shader.h"
 #include "RenderTarget.h"
+#include "ConstantBuffers.h"
+#include "FrameCB.h"
 #include "objects/AObject.h"
 
 class DXRenderer {
@@ -21,13 +24,11 @@ public:
 
 private:
     IDXGISwapChain *swapChain = nullptr;
-
     ID3D11Device *device = nullptr;
     ID3D11DeviceContext *deviceCtx = nullptr;
+
+    std::vector<ConstantBuffer> constantBuffers;
     std::shared_ptr<RenderTarget> renderTarget = nullptr;
     std::shared_ptr<Shader> shader = nullptr;
-
     std::unique_ptr<AObject> object = nullptr;
-
-//    ID3D11Buffer * createShaderConstants();
 };
