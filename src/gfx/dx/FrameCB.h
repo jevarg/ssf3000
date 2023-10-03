@@ -12,7 +12,6 @@ class FrameCB: public ConstantBuffer {
 public:
     struct Data {
         int32_t time;
-//        DirectX::XMMATRIX modelMatrix;
         DirectX::XMMATRIX viewMatrix;
         [[maybe_unused]] int32_t _padding[3];
     };

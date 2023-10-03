@@ -47,7 +47,7 @@ DXRenderer::DXRenderer(HWND hwnd) {
 
     renderTarget = std::make_shared<RenderTarget>(swapChain, device);
     shader = std::make_shared<Shader>(device, L"shaders/default.hlsl", L"shaders/default.hlsl");
-    object = std::make_unique<Triangle>(device);
+    object = std::make_unique<Cube>(device);
 
     RECT winRect;
     GetClientRect(hwnd, &winRect);
@@ -94,7 +94,7 @@ void DXRenderer::render(HWND hwnd) {
             &vertexOffset);
 
     auto duration = std::chrono::system_clock::now().time_since_epoch();
-    DirectX::XMVECTOR eyePosition = DirectX::XMVectorSet(0, 0, -10, 1);
+    DirectX::XMVECTOR eyePosition = DirectX::XMVectorSet(0, -2, -5, 1);
     DirectX::XMVECTOR focusPoint = DirectX::XMVectorSet(0, 0, 0, 1);
     DirectX::XMVECTOR upDirection = DirectX::XMVectorSet(0, 1, 0, 0);
 
@@ -102,7 +102,6 @@ void DXRenderer::render(HWND hwnd) {
 
     constantBuffers[CBType::FRAME].setData<FrameCB::Data>(deviceCtx, {
             static_cast<int32_t>(duration.count()),
-//            DirectX::XMMatrixIdentity(),
             viewMatrix
     });
 

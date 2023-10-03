@@ -122,7 +122,7 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
             return TRUE;
         case WM_ACTIVATE:
             SetWindowLongPtr(hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN);
-            SetWindowPos(hwnd, nullptr, 0, 0, 1920, 1080, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+            SetWindowPos(hwnd, nullptr, 0, 0, 800, 600, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
             return TRUE;
 
         case WM_CREATE: {
