@@ -23,9 +23,9 @@ public:
         XMMATRIX transform = XMMatrixIdentity();
 
         transform *= XMMatrixScalingFromVector(XMLoadFloat3(&m_Scale));
-//        transform *= XMMatrixRotationX(XMConvertToRadians(m_Rotation.x));
-//        transform *= XMMatrixRotationY(XMConvertToRadians(m_Rotation.y));
-//        transform *= XMMatrixRotationZ(XMConvertToRadians(m_Rotation.z));
+        transform *= XMMatrixRotationX(XMConvertToRadians(m_Rotation.x));
+        transform *= XMMatrixRotationY(XMConvertToRadians(m_Rotation.y));
+        transform *= XMMatrixRotationZ(XMConvertToRadians(m_Rotation.z));
         transform *= XMMatrixTranslationFromVector(XMLoadFloat3(&m_Position));
 
         return transform;
