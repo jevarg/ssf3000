@@ -27,7 +27,14 @@ add_executable(${PROJECT_NAME} WIN32
         src/gfx/dx/FrameCB.h
         src/gfx/dx/ConstantBuffers.h
         src/gfx/ConstantBuffer.h
-        src/gfx/dx/AppCB.h)
+        src/gfx/dx/AppCB.h
+        src/gfx/dx/objects/Head.cpp
+        src/gfx/dx/objects/Head.h)
+
+set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
+set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)
+set(TINYGLTF_BUILD_LOADER_EXAMPLE OFF CACHE INTERNAL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/lib/tinygltf)
 
 target_link_libraries(${PROJECT_NAME}
         Scrnsave.lib
@@ -35,4 +42,5 @@ target_link_libraries(${PROJECT_NAME}
         Comctl32.dll
         d3d11.lib
         dxgi.lib
-        d3dcompiler.lib)
+        d3dcompiler.lib
+        tinygltf)

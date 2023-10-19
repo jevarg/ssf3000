@@ -30,3 +30,5 @@ Triangle::Triangle(ID3D11Device *device) : AObject(3, 6 * sizeof(float), 0) {
         assert(SUCCEEDED(hr));
     }
 }
+
+void Triangle::build(ID3D11Device *device) {}

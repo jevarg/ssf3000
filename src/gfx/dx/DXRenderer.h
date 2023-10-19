@@ -13,6 +13,7 @@
 #include "ConstantBuffers.h"
 #include "FrameCB.h"
 #include "objects/AObject.h"
+#include "objects/Head.h"
 
 class DXRenderer {
 public:
@@ -31,5 +32,5 @@ private:
     std::vector<ConstantBuffer> constantBuffers;
     std::shared_ptr<RenderTarget> renderTarget = nullptr;
     std::shared_ptr<Shader> shader = nullptr;
-    std::unique_ptr<AObject> object = nullptr;
+    std::unique_ptr<Head> object;
 };

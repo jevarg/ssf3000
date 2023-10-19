@@ -18,7 +18,7 @@ Shader::Shader(ID3D11Device *device, LPCWSTR vertexFile, LPCWSTR pixelFile) {
 
     // COMPILE FRAME SHADER
     HRESULT hr = D3DCompileFromFile(
-            vertexFile,//L"shaders/default.hlsl",
+            vertexFile,
             nullptr,
             D3D_COMPILE_STANDARD_FILE_INCLUDE,
             "vs_main",

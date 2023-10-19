@@ -11,6 +11,8 @@ using namespace DirectX;
 
 class AObject {
 public:
+    virtual void build(ID3D11Device *device) = 0;
+
     [[nodiscard]] virtual ID3D11Buffer *getBuffer() const { return m_VertexBuffer; }
 
     [[nodiscard]] virtual UINT getVertexCount() const { return m_VertexCount; }
@@ -57,8 +59,6 @@ protected:
                                                        m_Position(0, 0, 0),
                                                        m_Rotation(0, 0, 0),
                                                        m_Scale(1, 1, 1) {}
-
-//    XMMATRIX transform;
 
     XMFLOAT3 m_Position;
     XMFLOAT3 m_Rotation;

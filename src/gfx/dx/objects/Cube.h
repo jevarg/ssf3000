@@ -10,4 +10,6 @@ class Cube: public AObject {
 public:
     explicit Cube(ID3D11Device *device);
     Cube(const Cube&) = delete;
+
+    void build(ID3D11Device *device) override;
 };

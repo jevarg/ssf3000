@@ -10,6 +10,7 @@
 #include "FrameCB.h"
 #include "ConstantBuffers.h"
 #include "AppCB.h"
+#include "objects/Head.h"
 
 using namespace DirectX;
 
@@ -49,7 +50,8 @@ DXRenderer::DXRenderer(HWND hwnd) {
 
     renderTarget = std::make_shared<RenderTarget>(swapChain, device);
     shader = std::make_shared<Shader>(device, L"shaders/default.hlsl", L"shaders/default.hlsl");
-    object = std::make_unique<Cube>(device);
+    object = std::make_unique<Head>();
+    object->build(device);
 
     RECT winRect;
     GetClientRect(hwnd, &winRect);
@@ -70,6 +72,8 @@ DXRenderer::DXRenderer(HWND hwnd) {
 
     constantBuffers.push_back(appCB); // CBType::App [0]
     constantBuffers.push_back(FrameCB(device)); // CBType::FRAME [1]
+//    Head head;
+//    head.build(device);
 }
 
 void DXRenderer::clear() {
@@ -94,9 +98,9 @@ void DXRenderer::update() {
 
 void DXRenderer::render(HWND hwnd) {
     ID3D11RenderTargetView *rt = renderTarget->get();
-    ID3D11Buffer *vertexBuffer = object->getBuffer();
-    UINT vertexStride = object->getVertexStride();
-    UINT vertexOffset = object->getVertexOffset();
+//    ID3D11Buffer *vertexBuffer = object->getBuffer();
+    UINT vertexStride = 3 * sizeof(float);//object->getVertexStride();
+    UINT vertexOffset = 0;//object->getVertexOffset();
 
     deviceCtx->OMSetRenderTargets(1, &rt, nullptr);
     deviceCtx->IASetPrimitiveTopology(
@@ -105,9 +109,10 @@ void DXRenderer::render(HWND hwnd) {
     deviceCtx->IASetVertexBuffers(
             0,
             1,
-            &vertexBuffer,
+            &object->buffers["POSITION"],
             &vertexStride,
             &vertexOffset);
+    deviceCtx->IASetIndexBuffer(object->indices, DXGI_FORMAT_R16_UINT, 0);
 
     auto duration = std::chrono::system_clock::now().time_since_epoch();
     XMVECTOR eyePosition = XMVectorSet(0, 3, -5, 1);
@@ -116,7 +121,7 @@ void DXRenderer::render(HWND hwnd) {
 
     auto viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 
-    object->rotate(0.8f, 0.8f, 0);
+    object->rotate(0, 0.2f, 0);
     constantBuffers[CBType::FRAME].setData<FrameCB::Data>(deviceCtx, {
             static_cast<int32_t>(duration.count()),
             viewMatrix,
@@ -132,6 +137,7 @@ void DXRenderer::render(HWND hwnd) {
     deviceCtx->PSSetShader(shader->getPixelShader(), nullptr, 0);
     deviceCtx->VSSetConstantBuffers(0, 2, cBuffers);
 
-    deviceCtx->Draw(object->getVertexCount(), 0);
+    deviceCtx->DrawIndexed(object->indexCount, 0, 0);
+//    deviceCtx->Draw(object->getVertexCount(), 0);
     swapChain->Present(1, 0);
 }

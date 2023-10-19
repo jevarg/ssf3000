@@ -73,3 +73,5 @@ Cube::Cube(ID3D11Device *device): AObject(36, 6 * sizeof(float), 0) {
         assert(SUCCEEDED(hr));
     }
 }
+
+void Cube::build(ID3D11Device *device) {}
