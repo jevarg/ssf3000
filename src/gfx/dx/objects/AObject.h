@@ -13,60 +13,35 @@ class AObject {
 public:
     virtual void build(ID3D11Device *device) = 0;
 
-    [[nodiscard]] virtual ID3D11Buffer *getBuffer() const { return m_VertexBuffer; }
+    [[nodiscard]] virtual ID3D11Buffer *getBuffer() const;
 
-    [[nodiscard]] virtual UINT getVertexCount() const { return m_VertexCount; }
+    [[nodiscard]] virtual UINT getVertexCount() const;
 
-    [[nodiscard]] virtual UINT getVertexStride() const { return m_VertexStride; }
+    [[nodiscard]] virtual UINT getVertexStride() const;
 
-    [[nodiscard]] virtual UINT getVertexOffset() const { return m_VertexOffset; }
+    [[nodiscard]] virtual UINT getVertexOffset() const;
 
-    [[nodiscard]] virtual XMMATRIX getTransform() const {
-        XMMATRIX transform = XMMatrixIdentity();
+    [[nodiscard]] virtual XMMATRIX getTransform() const;
 
-        transform *= XMMatrixScalingFromVector(XMLoadFloat3(&m_Scale));
-        transform *= XMMatrixRotationX(XMConvertToRadians(m_Rotation.x));
-        transform *= XMMatrixRotationY(XMConvertToRadians(m_Rotation.y));
-        transform *= XMMatrixRotationZ(XMConvertToRadians(m_Rotation.z));
-        transform *= XMMatrixTranslationFromVector(XMLoadFloat3(&m_Position));
+    virtual void rotate(float xDeg, float yDeg, float zDeg);
 
-        return transform;
-    }
+    virtual void translate(float x, float y, float z);
 
-    virtual void rotate(float xDeg, float yDeg, float zDeg) {
-        m_Rotation.x += xDeg;
-        m_Rotation.y += yDeg;
-        m_Rotation.z += zDeg;
-    }
-
-    virtual void translate(float x, float y, float z) {
-        m_Position.x += x;
-        m_Position.y += y;
-        m_Position.z += z;
-    }
-
-    void scale(float x, float y, float z) {
-        m_Scale.x += x;
-        m_Scale.y += y;
-        m_Scale.z += z;
-    }
+    void scale(float x, float y, float z);
 
 protected:
-    AObject(UINT vCount, UINT vStride, UINT vOffset) : m_VertexBuffer(nullptr),
-                                                       m_VertexCount(vCount),
-                                                       m_VertexStride(vStride),
-                                                       m_VertexOffset(vOffset),
-                                                       m_Position(0, 0, 0),
-                                                       m_Rotation(0, 0, 0),
-                                                       m_Scale(1, 1, 1) {}
+    AObject(UINT vCount, UINT vStride, UINT vOffset);
 
-    XMFLOAT3 m_Position;
-    XMFLOAT3 m_Rotation;
-    XMFLOAT3 m_Scale;
-
-    ID3D11Buffer *m_VertexBuffer;
+    XMFLOAT3 m_Position = {0, 0, 0};
+    XMFLOAT3 m_Rotation = {0, 0, 0};
+    XMFLOAT3 m_Scale = {1, 1, 1};
 
     UINT m_VertexCount;
     UINT m_VertexStride;
     UINT m_VertexOffset;
+    UINT m_IndexCount = 0;
+
+    ID3D11Buffer *m_VertexBuffer = nullptr;
+    ID3D11Buffer *m_IndexBuffer = nullptr;
+
 };

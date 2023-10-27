@@ -84,10 +84,7 @@ void DXRenderer::clear() {
 //            0xED / 255.0f,
 //            1.0f};
 
-    float background_colour[4] = {
-            0, 0, 0,
-            1.0f
-    };
+    float background_colour[4] = { 0, 0, 0, 1.0f };
 
     deviceCtx->ClearRenderTargetView(renderTarget->get(), background_colour);
 }
@@ -99,23 +96,32 @@ void DXRenderer::update() {
 void DXRenderer::render(HWND hwnd) {
     ID3D11RenderTargetView *rt = renderTarget->get();
 //    ID3D11Buffer *vertexBuffer = object->getBuffer();
-    UINT vertexStride = 3 * sizeof(float);//object->getVertexStride();
-    UINT vertexOffset = 0;//object->getVertexOffset();
 
     deviceCtx->OMSetRenderTargets(1, &rt, nullptr);
     deviceCtx->IASetPrimitiveTopology(
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     deviceCtx->IASetInputLayout(shader->getInputLayout());
+    ID3D11Buffer *buffers[] = {
+            object->buffers["POSITION"],
+            object->buffers["TEXCOORD_0"]
+    };
+    UINT vertexStrides[] = {
+            3 * sizeof(float),
+            2 * sizeof(float)
+    };
+    UINT vertexOffsets[] = {
+            0, 0
+    };//object->getVertexOffset();
     deviceCtx->IASetVertexBuffers(
             0,
-            1,
-            &object->buffers["POSITION"],
-            &vertexStride,
-            &vertexOffset);
+            2,
+            buffers,
+            vertexStrides,
+            vertexOffsets);
     deviceCtx->IASetIndexBuffer(object->indices, DXGI_FORMAT_R16_UINT, 0);
 
     auto duration = std::chrono::system_clock::now().time_since_epoch();
-    XMVECTOR eyePosition = XMVectorSet(0, 3, -5, 1);
+    XMVECTOR eyePosition = XMVectorSet(0, 1, -5, 1);
     XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
     XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
 
@@ -136,6 +142,7 @@ void DXRenderer::render(HWND hwnd) {
     deviceCtx->VSSetShader(shader->getVertexShader(), nullptr, 0);
     deviceCtx->PSSetShader(shader->getPixelShader(), nullptr, 0);
     deviceCtx->VSSetConstantBuffers(0, 2, cBuffers);
+    deviceCtx->PSSetShaderResources(0, 1, &object->srv);
 
     deviceCtx->DrawIndexed(object->indexCount, 0, 0);
 //    deviceCtx->Draw(object->getVertexCount(), 0);

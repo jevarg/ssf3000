@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 project(ssf3000
     DESCRIPTION "farming3000 Screensaver")
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXECUTABLE_SUFFIX ".scr")
 
 add_executable(${PROJECT_NAME} WIN32
@@ -29,7 +29,8 @@ add_executable(${PROJECT_NAME} WIN32
         src/gfx/ConstantBuffer.h
         src/gfx/dx/AppCB.h
         src/gfx/dx/objects/Head.cpp
-        src/gfx/dx/objects/Head.h)
+        src/gfx/dx/objects/Head.h
+        src/gfx/dx/objects/AObject.cpp)
 
 set(TINYGLTF_HEADER_ONLY ON CACHE INTERNAL "" FORCE)
 set(TINYGLTF_INSTALL OFF CACHE INTERNAL "" FORCE)

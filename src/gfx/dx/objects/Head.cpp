@@ -30,27 +30,42 @@ Head::Head(): AObject(0, 0, 0) {
 
 void Head::build(ID3D11Device *device) {
     for (const auto &mesh : m_Model.meshes) {
+        for (const auto &material : m_Model.materials) {
+            const auto &glTFTex = m_Model.textures[material.emissiveTexture.index];
+            const auto &glTFImage = m_Model.images[glTFTex.source];
+
+            D3D11_TEXTURE2D_DESC desc = {};
+            desc.Width = glTFImage.width;
+            desc.Height = glTFImage.height;
+            desc.MipLevels = 1;
+            desc.ArraySize = 1;
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+
+            D3D11_SUBRESOURCE_DATA initData = {};
+            initData.pSysMem = glTFImage.image.data();
+            initData.SysMemPitch = glTFImage.width * glTFImage.component;
+
+//            ID3D11Texture2D *dxTex;
+            HRESULT res = device->CreateTexture2D(&desc, &initData, &tex);
+            assert(SUCCEEDED(res));
+
+            D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+            srvDesc.Format = desc.Format;
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+            srvDesc.Texture2D.MipLevels = 1;
+
+            res = device->CreateShaderResourceView(tex, &srvDesc, &srv);
+            assert(SUCCEEDED(res));
+        }
+
         for (const auto &primitive : mesh.primitives) {
             if (primitive.indices > -1) {
                 const auto &accessor = m_Model.accessors[primitive.indices];
-                const tinygltf::BufferView &bufferView = m_Model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer &buffer = m_Model.buffers[bufferView.buffer];
-
-                D3D11_BUFFER_DESC bufferDesc = {};
-                bufferDesc.ByteWidth = accessor.count * tinygltf::GetNumComponentsInType(accessor.type) * tinygltf::GetComponentSizeInBytes(accessor.componentType); // TODO: determine stride w/ posAccessor.componentType
-                bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-                bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-                D3D11_SUBRESOURCE_DATA data = {};
-                data.pSysMem = &buffer.data[bufferView.byteOffset + accessor.byteOffset];
-
-                HRESULT hr = device->CreateBuffer(
-                        &bufferDesc,
-                        &data,
-                        &indices);
-
-                assert(SUCCEEDED(hr));
-
+                indices = m_CreateBuffer(device, D3D11_BIND_INDEX_BUFFER, accessor);
                 indexCount = accessor.count;
             }
 
@@ -61,26 +76,30 @@ void Head::build(ID3D11Device *device) {
                     exit(-1);
                 }
 
-                const tinygltf::BufferView &bufferView = m_Model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer &buffer = m_Model.buffers[bufferView.buffer];
-
-                D3D11_BUFFER_DESC bufferDesc = {};
-                bufferDesc.ByteWidth = tinygltf::GetComponentSizeInBytes(accessor.componentType) * accessor.count * tinygltf::GetNumComponentsInType(accessor.type);
-                bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-                bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-                D3D11_SUBRESOURCE_DATA data = {};
-                data.pSysMem = &buffer.data[bufferView.byteOffset + accessor.byteOffset];
-
-                ID3D11Buffer *dxBuffer;
-                HRESULT hr = device->CreateBuffer(
-                        &bufferDesc,
-                        &data,
-                        &dxBuffer);
-
-                assert(SUCCEEDED(hr));
-                buffers[attributeName] = dxBuffer;
+                buffers[attributeName] = m_CreateBuffer(device, D3D11_BIND_VERTEX_BUFFER, accessor);
             }
         }
     }
+}
+
+ID3D11Buffer *Head::m_CreateBuffer(ID3D11Device *device, D3D11_BIND_FLAG bindFlags, const tinygltf::Accessor &accessor) {
+    const tinygltf::BufferView &bufferView = m_Model.bufferViews[accessor.bufferView];
+    const tinygltf::Buffer &glTFBuffer = m_Model.buffers[bufferView.buffer];
+
+    D3D11_BUFFER_DESC bufferDesc = {};
+    bufferDesc.ByteWidth = accessor.count * tinygltf::GetNumComponentsInType(accessor.type) * tinygltf::GetComponentSizeInBytes(accessor.componentType);
+    bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    bufferDesc.BindFlags = bindFlags;
+
+    D3D11_SUBRESOURCE_DATA data = {};
+    data.pSysMem = &glTFBuffer.data[bufferView.byteOffset + accessor.byteOffset];
+
+    ID3D11Buffer *dxBuffer;
+    HRESULT hr = device->CreateBuffer(
+            &bufferDesc,
+            &data,
+            &dxBuffer);
+
+    assert(SUCCEEDED(hr));
+    return dxBuffer;
 }
