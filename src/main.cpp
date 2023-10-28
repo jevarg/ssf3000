@@ -120,10 +120,16 @@ LRESULT WINAPI ScreenSaverProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
         case WM_MBUTTONDOWN:
         case WM_RBUTTONDOWN:
             return TRUE;
-        case WM_ACTIVATE:
-            SetWindowLongPtr(hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN);
-            SetWindowPos(hwnd, nullptr, 0, 0, 800, 600, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-            return TRUE;
+        case WM_NCACTIVATE:
+            return FALSE; // DEBUG: To prevent killing the app if not in focus
+        case WM_ACTIVATE: {
+            if (wParam == WA_ACTIVE) {
+                SetWindowLongPtr(hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_CLIPCHILDREN);
+                SetWindowPos(hwnd, nullptr, 0, 0, 800, 600, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+                return TRUE;
+            }
+            return FALSE;
+        }
 
         case WM_CREATE: {
             if (!DirectX::XMVerifyCPUSupport()) {

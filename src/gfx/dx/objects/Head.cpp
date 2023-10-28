@@ -31,7 +31,7 @@ Head::Head(): AObject(0, 0, 0) {
 void Head::build(ID3D11Device *device) {
     for (const auto &mesh : m_Model.meshes) {
         for (const auto &material : m_Model.materials) {
-            const auto &glTFTex = m_Model.textures[material.emissiveTexture.index];
+            const auto &glTFTex = m_Model.textures[material.pbrMetallicRoughness.baseColorTexture.index];
             const auto &glTFImage = m_Model.images[glTFTex.source];
 
             D3D11_TEXTURE2D_DESC desc = {};
