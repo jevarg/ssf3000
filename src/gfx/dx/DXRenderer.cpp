@@ -70,10 +70,27 @@ DXRenderer::DXRenderer(HWND hwnd) {
                                                       0.1f,
                                                       1000.0f));
 
-    constantBuffers.push_back(appCB); // CBType::App [0]
-    constantBuffers.push_back(FrameCB(device)); // CBType::FRAME [1]
-//    Head head;
-//    head.build(device);
+    constantBuffers.push_back(appCB);
+    constantBuffers.push_back(FrameCB(device));
+
+    ID3D11Texture2D* depthStencilBuffer = nullptr;
+    D3D11_TEXTURE2D_DESC descDepth;
+    descDepth.Width = static_cast<UINT>(viewport.Width);
+    descDepth.Height = static_cast<UINT>(viewport.Height);
+    descDepth.MipLevels = 1;
+    descDepth.ArraySize = 1;
+    descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    descDepth.SampleDesc.Count = 1;
+    descDepth.SampleDesc.Quality = 0;
+    descDepth.Usage = D3D11_USAGE_DEFAULT;
+    descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    descDepth.CPUAccessFlags = 0;
+    descDepth.MiscFlags = 0;
+    hr = device->CreateTexture2D(&descDepth, nullptr, &depthStencilBuffer);
+    assert(SUCCEEDED(hr));
+
+    hr = device->CreateDepthStencilView(depthStencilBuffer, nullptr, &depthStencilView);
+    assert(SUCCEEDED(hr));
 }
 
 void DXRenderer::clear() {
@@ -87,6 +104,7 @@ void DXRenderer::clear() {
     float background_colour[4] = { 0, 0, 0, 1.0f };
 
     deviceCtx->ClearRenderTargetView(renderTarget->get(), background_colour);
+    deviceCtx->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void DXRenderer::update() {
@@ -97,7 +115,7 @@ void DXRenderer::render(HWND hwnd) {
     ID3D11RenderTargetView *rt = renderTarget->get();
 //    ID3D11Buffer *vertexBuffer = object->getBuffer();
 
-    deviceCtx->OMSetRenderTargets(1, &rt, nullptr);
+    deviceCtx->OMSetRenderTargets(1, &rt, depthStencilView);
     deviceCtx->IASetPrimitiveTopology(
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     deviceCtx->IASetInputLayout(shader->getInputLayout());
@@ -105,11 +123,11 @@ void DXRenderer::render(HWND hwnd) {
             object->buffers["POSITION"],
             object->buffers["TEXCOORD_0"]
     };
-    UINT vertexStrides[] = {
+    constexpr UINT vertexStrides[] = {
             3 * sizeof(float),
             2 * sizeof(float)
     };
-    UINT vertexOffsets[] = {
+    constexpr UINT vertexOffsets[] = {
             0, 0
     };//object->getVertexOffset();
     deviceCtx->IASetVertexBuffers(
@@ -121,22 +139,22 @@ void DXRenderer::render(HWND hwnd) {
     deviceCtx->IASetIndexBuffer(object->indices, DXGI_FORMAT_R16_UINT, 0);
 
     auto duration = std::chrono::system_clock::now().time_since_epoch();
-    XMVECTOR eyePosition = XMVectorSet(0, 1, -5, 1);
-    XMVECTOR focusPoint = XMVectorSet(0, 0, 0, 1);
-    XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
+    const XMVECTOR eyePosition = XMVectorSet(0, 1, -5, 1);
+    const XMVECTOR focusPoint = XMVectorSet(0, 1, 0, 1);
+    const XMVECTOR upDirection = XMVectorSet(0, 1, 0, 0);
 
-    auto viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
+    const auto viewMatrix = XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
 
     object->rotate(0, 0.2f, 0);
-    constantBuffers[CBType::FRAME].setData<FrameCB::Data>(deviceCtx, {
-            static_cast<int32_t>(duration.count()),
-            viewMatrix,
-            object->getTransform()
+    constantBuffers[FRAME].setData<FrameCB::Data>(deviceCtx, {
+        static_cast<int32_t>(duration.count()),
+        viewMatrix,
+        object->getTransform()
     });
 
     ID3D11Buffer *cBuffers[] = {
-            constantBuffers[CBType::APP].getBuffer(),
-            constantBuffers[CBType::FRAME].getBuffer(),
+            constantBuffers[APP].getBuffer(),
+            constantBuffers[FRAME].getBuffer(),
     };
 
     deviceCtx->VSSetShader(shader->getVertexShader(), nullptr, 0);

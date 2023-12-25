@@ -13,7 +13,7 @@ Head::Head(): AObject(0, 0, 0) {
     std::string err;
     std::string warn;
 
-    bool success = loader.LoadBinaryFromFile(&m_Model, &err, &warn, "assets/sarah.glb");
+    bool success = loader.LoadBinaryFromFile(&m_Model, &err, &warn, "assets/jg.glb");
     if (!warn.empty()) {
         printf("Warn: %s\n", warn.c_str());
     }

@@ -28,6 +28,7 @@ private:
     IDXGISwapChain *swapChain = nullptr;
     ID3D11Device *device = nullptr;
     ID3D11DeviceContext *deviceCtx = nullptr;
+    ID3D11DepthStencilView *depthStencilView = nullptr;
 
     std::vector<ConstantBuffer> constantBuffers;
     std::shared_ptr<RenderTarget> renderTarget = nullptr;
